@@ -4,8 +4,7 @@ using System.Text;
 
 namespace OOAGame
 {
-    public abstract class Plant
+    internal class Upgrade
     {
-        public abstract void TestMethod();
     }
 }
