@@ -5,9 +5,10 @@ using System.Text;
 
 namespace OOAGame
 {
-    internal struct Upgrade
+    public struct Upgrade
     {
         // These are default values
+        required public int id = 0;
         required public string name = "Sprinkler";
         required public string description = "Default";
         required public float baseCost = 10;
@@ -17,9 +18,15 @@ namespace OOAGame
         public float heightPerSecond = 0;
         public float heightPerClick = 0;
         public float beansPerSecondPerHeight = 0;
+        public bool isVisible = true;
         public float Cost
         {
             get => field = baseCost * MathF.Pow(UpgradeManager.UPGRADE_COST_INCREASE, currentCount);
+            private set;
+        }
+        public int BoxHeight
+        {
+            get => field = 3 + (int)MathF.Ceiling(description.Length / (float)(GraphicsManager.UPGRADE_BOX_WIDTH - 2));
             private set;
         }
         public Upgrade()
