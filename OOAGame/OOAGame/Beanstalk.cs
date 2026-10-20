@@ -6,12 +6,43 @@ namespace OOAGame
 {
     public static class Beanstalk
     {
-        public static float height;
-        public static float beans;
+        public static float height = 100;
+        public static float beans = 0;
         public static float beansPerSecondPerHeight = 0.01f;
-        public static float beansPerSecond;
-        public static float heightPerSecond;
+        public static float beansPerSecond = 0;
+        public static float heightPerSecond = 0;
         public static float heightPerClick = 1;
-        public static Dictionary<string, int> acquiredUpgrades;
+        public static float beansPerClick = 0;
+
+        public static void AddHeightPerSecond()
+        {
+            AddHeight(heightPerSecond);
+        }
+
+        public static void AddBeansPerSecond()
+        {
+            AddBeans(beansPerSecond + beansPerSecondPerHeight * height);
+        }
+
+        public static void AddOnClick()
+        {
+            AddHeight(heightPerClick);
+            AddBeans(beansPerClick);
+        }
+
+        public static void AddBeans(float beansToAdd)
+        {
+            // If player has fertilizer upgrade, there is a 20% chance to gain double beans.
+            if(UpgradeManager.GetUpgradeCount("Fertilizer") > 0 && new Random().Next(0, 5) == 0)
+            {
+                beansToAdd *= 2;
+            }
+            beans += beansToAdd;
+        }
+
+        public static void AddHeight(float heightToAdd)
+        {
+            height += heightToAdd;
+        }
     }
 }

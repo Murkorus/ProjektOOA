@@ -1,25 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace OOAGame
 {
-    internal class Upgrade
+    internal struct Upgrade
     {
-        public string name;
-        public float cost;
-        public int maxCount;
-        private float beansPerSecond;
-        private float heightPerSecond;
-        private float heightPerClick;
-        public Upgrade(string name, float cost, int maxCount, float beansPerSecond, float heightPerSecond, float heightPerClick)
+        // These are default values
+        required public string name = "Sprinkler";
+        required public string description = "Default";
+        required public float baseCost = 10;
+        public int maxCount = int.MaxValue;
+        public int currentCount = 0;
+        public float beansPerSecond = 0;
+        public float heightPerSecond = 0;
+        public float heightPerClick = 0;
+        public float beansPerSecondPerHeight = 0;
+        public float Cost
         {
-            this.name = name;
-            this.cost = cost;
-            this.maxCount = maxCount;
-            this.beansPerSecond = beansPerSecond;
-            this.heightPerSecond = heightPerSecond;
-            this.heightPerClick = heightPerClick;
+            get => field = baseCost * MathF.Pow(UpgradeManager.UPGRADE_COST_INCREASE, currentCount);
+            private set;
         }
+        public Upgrade()
+        {
+
+        }
+
+        /// <summary>
+        /// Applies the upgrade parameters by adding the upgrade values to the beanstalk class values.
+        /// </summary>
+        public void Apply()
+        {
+            Beanstalk.heightPerSecond += heightPerSecond;
+            Beanstalk.heightPerClick += heightPerClick;
+            Beanstalk.beansPerSecond += beansPerSecond;
+            Beanstalk.beansPerSecondPerHeight += beansPerSecondPerHeight;
+        }
+
+        /*
+        /// <summary>
+        /// Compares the name of two Upgrades to check if they are equal, since all other variables do not matter.
+        /// </summary>
+        /// <param name="obj">The other Upgrade to compare equality with</param>
+        /// <returns></returns>
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            if (!(obj is Upgrade)) return false;
+            if (((Upgrade)obj).name == name) return true;
+            return false;
+        }
+        */
     }
 }

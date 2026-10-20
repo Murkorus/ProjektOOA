@@ -20,18 +20,27 @@ namespace OOAGame
         public const int TOTAL_UI_ELEMENTS = 2;
         public static void PrintBeanstalk()
         {
-            Console.Write(GetBeanstalkArt());
+            string[] art = GetBeanstalkArt(0);
+            for(int i = 0; i < art.Length; i++)
+            {
+                Console.SetCursorPosition(5, 10 + i);
+                Console.Write(art[i]);
+            }
         }
 
-        private static string GetBeanstalkArt()
+        private static string[] GetBeanstalkArt(int index)
         {
-            string beanSprout = "        █████████           \n     ████████████           \n   ███████████████          \n ██████████████████         \n███████████████████         \n█████    ████ ████          \n             █████          \n           ███████████      \n           █████████████    \n           ██████████████   \n           ██████████████   \n           ███████████████  \n          █████ ███████████ \n          █████  ███████████\n          ██████    ████████\n          ██████          ██\n          ███████           \n          ███████           \n          ████████          \n          ████████          \n";
-            
-            // TODO: Logic for picking sprite goes here
-            // ...
-            string art = beanSprout;
-            
-            return art;
+            List<string> art = new();
+            using (StreamReader sr = new StreamReader($"Art\\Art{index}.txt"))
+            {
+                string line;
+                // Read and display lines from the file until the end of the file is reached.
+                while ((line = sr.ReadLine()) != null)
+                {
+                    art.Add(line);
+                }
+            }
+            return art.ToArray();
         }
 
         public static void PrintUIElement(int id)

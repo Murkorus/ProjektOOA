@@ -4,16 +4,42 @@ using System.Text;
 
 namespace OOAGame
 {
-    internal class UpgradeManager
+    internal static class UpgradeManager
     {
-        public static Upgrade[] upgrades = new Upgrade[]
+        public const float UPGRADE_COST_INCREASE = 1.15f;
+
+        public static Upgrade[] upgrades =
         {
-            new Upgrade("Sprinkler", 10f, int.MaxValue, 0, 1, 0)
+            new(){name = "Sprinkler", description = "+1 height per second", baseCost = 10, heightPerSecond = 1},
+            new(){name = "Gardener", description = "+0.01 beans per second per height", baseCost = 30, maxCount = 3, beansPerSecondPerHeight = 0.01f},
+            new(){name = "Fertilizer", description = "+20% chance to double amount of beans gained whenever you gain beans", baseCost = 200, maxCount = 1},
         };
+
+        public static int GetUpgradeCount(int index)
+        {
+            return upgrades[index].currentCount;
+        }
+
+        public static int GetUpgradeCount(string name)
+        {
+            for(int i = 0; i < upgrades.Length; i++)
+            {
+                if (upgrades[i].name == name) return GetUpgradeCount(i);
+            }
+
+            return 0;
+        }
 
         public static void BuyUpgrade(int index)
         {
+            Upgrade upgrade = upgrades[index];
+            if (upgrade.currentCount >= upgrade.maxCount) return; // If the player has already bought the max amount they can
+            if (Beanstalk.beans < upgrade.Cost) return; // If the player doesn't have enough money
 
+            Beanstalk.beans -= upgrade.Cost;
+
+            upgrades[index].currentCount++;
+            upgrade.Apply();
         }
     }
 }

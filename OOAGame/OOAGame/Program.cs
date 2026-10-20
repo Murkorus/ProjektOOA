@@ -21,7 +21,25 @@ namespace OOAGame
 
                     if(key.Key == ConsoleKey.Spacebar)
                     {
-                        Click();
+                        switch (GraphicsManager.SelectedUIElement)
+                        {
+                            default:
+                                Click();
+                                break;
+                        }
+                    }
+                    // Temporary
+                    else if(key.Key == ConsoleKey.D1)
+                    {
+                        UpgradeManager.BuyUpgrade(0);
+                    }
+                    else if (key.Key == ConsoleKey.D2)
+                    {
+                        UpgradeManager.BuyUpgrade(1);
+                    }
+                    else if (key.Key == ConsoleKey.D3)
+                    {
+                        UpgradeManager.BuyUpgrade(2);
                     }
                 }
 
@@ -32,18 +50,25 @@ namespace OOAGame
                 }
 
                 GraphicsManager.PrintAllUI();
+                Console.SetCursorPosition(0, 3);
+                for(int i = 0; i < UpgradeManager.upgrades.Length; i++)
+                {
+                    Upgrade upgrade = UpgradeManager.upgrades[i];
+                    Console.WriteLine($"{upgrade.name}: {(int)upgrade.Cost}\n {upgrade.description}");
+                }
+                GraphicsManager.PrintBeanstalk();
             }
         }
 
         private static void Click()
         {
-            Beanstalk.height += Beanstalk.heightPerClick;
+            Beanstalk.AddOnClick();
         }
 
         private static void NextFrame()
         {
-            Beanstalk.beans += Beanstalk.beansPerSecond + Beanstalk.beansPerSecondPerHeight * Beanstalk.height;
-            Beanstalk.height += Beanstalk.heightPerSecond;
+            Beanstalk.AddBeansPerSecond();
+            Beanstalk.AddHeightPerSecond();
         }
     }
 }
