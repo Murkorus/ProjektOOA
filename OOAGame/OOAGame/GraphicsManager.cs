@@ -20,7 +20,18 @@ namespace OOAGame
         public const int TOTAL_UI_ELEMENTS = 2;
         public static void PrintBeanstalk()
         {
+            Console.Write(GetBeanstalkArt());
+        }
 
+        private static string GetBeanstalkArt()
+        {
+            string beanSprout = "        █████████           \n     ████████████           \n   ███████████████          \n ██████████████████         \n███████████████████         \n█████    ████ ████          \n             █████          \n           ███████████      \n           █████████████    \n           ██████████████   \n           ██████████████   \n           ███████████████  \n          █████ ███████████ \n          █████  ███████████\n          ██████    ████████\n          ██████          ██\n          ███████           \n          ███████           \n          ████████          \n          ████████          \n";
+            
+            // TODO: Logic for picking sprite goes here
+            // ...
+            string art = beanSprout;
+            
+            return art;
         }
 
         public static void PrintUIElement(int id)
@@ -53,5 +64,5 @@ namespace OOAGame
                 PrintUIElement(i);
             }
         }
-    }
+    } 
 }
