@@ -13,27 +13,27 @@ namespace OOAGame
         }
         public const int UPGRADE_BOX_WIDTH = 40;
         public const int BEANSTALK_BOX_WIDTH = 80; // Beanstalk ascii art must at most be this width minus 2 to account for the box border. So if width is 80, ascii art can at most have 78 characters per line.
-        public static Upgrade[] upgradesToShow;
+        private static Upgrade[] upgradesToShow;
         public static int selectedUpgradeIndex = 0;
         private static int SelectedUpgradeID
         {
             get => field = upgradesToShow[selectedUpgradeIndex].id;
         }
-        private static Upgrade SelectedUpgrade
+        private static Upgrade SelectedUpgrade // Note that a struct is a value-type, not a reference type. If you want to change the values, you still need a direct reference to the UpgraderManager Upgrade instance.
         {
             get => UpgradeManager.upgrades[SelectedUpgradeID];
         }
         public static UIElement selectedUI = 0;
         private static ConsoleColor selectedColor = ConsoleColor.White;
         private static ConsoleColor unselectedColor = ConsoleColor.DarkGreen;
+        private static int currentBeanstalkSprite = 0;
 
         public static void Load()
         {
             UpdateShownUpgrades(0);
-            for(int i = 0; i < upgradesToShow.Length; i++)
-            {
-                PrintUpgrade(i);
-            }
+            PrintAllUpgrades();
+            PrintBeanstalk();
+            PrintStatCounters();
         }
 
         /// <summary>
@@ -49,17 +49,56 @@ namespace OOAGame
                     // If the player currently has the beanstalk viewport selected, and they press space, execute a click.
                     Beanstalk.Click();
                 }
-                else if (selectedUI == UIElement.Upgrades)
+                else if (selectedUI == UIElement.Upgrades && upgradesToShow.Length > 0)
                 {
                     // If the player currently has an upgrade selected, and they press space, buy that upgrade and update its visuals.
                     UpgradeManager.BuyUpgrade(SelectedUpgradeID);
 
+                    // If the upgrade has been bought the max number of times, hide it from the list.
                     if (SelectedUpgrade.currentCount >= SelectedUpgrade.maxCount)
                     {
-                        UpgradeManager.upgrades[SelectedUpgradeID].isVisible = false;
-                        if (SelectedUpgradeID > 0)
+                        // Firstly I want to check if this is the last visible upgrade left.
+                        // If it is, then there will be no upgrades left to print after this one is gone, so just remove it from the list and move on.
+                        Upgrade[] visibleUpgrades = UpgradeManager.GetVisibleUpgrades();
+
+                        // Checking if there is at least 1 upgrade other than the one about to be removed that's visible.
+                        if(visibleUpgrades.Length <= 1)
                         {
-                            for (int i = SelectedUpgradeID - 1; i >= 0; i--)
+                            // If there isn't, and this is the last visible upgrade, then just set it to be hidden, and update the list of shown upgrades.
+                            UpgradeManager.upgrades[SelectedUpgradeID].isVisible = false;
+                            UpdateShownUpgrades(0);
+                        }
+                        else
+                        {
+                            // If there is at least one upgrade left after the current one has been removed, then we go down here.
+
+                            // I want the list of upgrades to be intuitive to navigate, so there are a couple of edge-cases to keep in mind that will change what happens depending on where on the list this upgrade was at.
+                            // If the upgrade to be removed was the first in the list of shown upgrades, then start the new list at the next index.
+                            // If the upgrade to be removed was between the first and the last in the list of shown upgrades, then do the same, except if there is a visible upgrade further up on the list that is not currently shown, then start the list from that upgrade instead.
+                            // If the upgrade to be removed was the last in the list of shown upgrades, then start the new list from the next visible upgrade above the currently highest upgrade in the list of shown upgrades.
+
+                            // This offset will be important for an upcoming for-loop.
+                            // I'm checking if the last upgrade in the list of shown upgrades is also the last upgrade that is visible.
+                            // If it is, then the new list of shown upgrades should start one higher up than it currently does.
+                            // UNLESS the current highest shown upgrade is also the first visible upgrade in the list of upgrades, because if it is, then there is no visible upgrade that comes before it, and instead the list of shown upgrades should just get shorter.
+                            int startIndexOffset = 0;
+                            if (upgradesToShow[upgradesToShow.Length - 1].id == visibleUpgrades[visibleUpgrades.Length - 1].id && upgradesToShow[0].id > visibleUpgrades[0].id)
+                            {
+                                startIndexOffset = -1;
+                            }
+
+                            // Update the status of the selected upgrade to be hidden.
+                            // The order is important, I'm doing this down here rather than at the start of the big if-statment, because if I remove it before I check how many visible upgrades there are, then I will just get 0, and I can't check if the length of the array is less than 0, because that's impossible.
+                            // It's also important that it happens after I calculate the offset, because otherwise I would not be able to pull data about how many visible upgrades are left, since the array would then be empty and there would be no data left to access.
+                            UpgradeManager.upgrades[SelectedUpgradeID].isVisible = false;
+
+                            // Since one of the upgrades on the list is now supposed to be hidden, I need to update the list of shown upgrades and remove the current one.
+                            // It will be removed automatically during the evaluation in the UpdateShownUpgrades method, because it was set to be hidden earlier.
+                            // The method simply skips over all hidden upgrades, so it will not even be considered.
+                            // So here I start a new list of shown upgrades by starting the list from the next visible upgrade after I apply the previously calculated offset.
+                            // So in most cases, it starts from the same spot, but in the case that we would run out of upgrades to display at the bottom, it will try to go up by 1 instead if possible.
+                            // If that is also impossible (which happens if the list of visible upgrades has gotten too small to fill the entire screen), then it just displays less upgrades.
+                            for (int i = upgradesToShow[0].id + startIndexOffset; i < UpgradeManager.upgrades.Length; i++)
                             {
                                 if (UpgradeManager.upgrades[i].isVisible)
                                 {
@@ -67,12 +106,12 @@ namespace OOAGame
                                     break;
                                 }
                             }
+
+                            if (selectedUpgradeIndex > upgradesToShow.Length - 1) selectedUpgradeIndex = upgradesToShow.Length - 1;
                         }
                     }
-                    for (int i = 0; i < upgradesToShow.Length; i++)
-                    {
-                        PrintUpgrade(i);
-                    }
+
+                    PrintAllUpgrades();
                 }
             }
             else if (key == ConsoleKey.A)
@@ -80,27 +119,20 @@ namespace OOAGame
                 selectedUI -= 1;
                 if (selectedUI < 0) selectedUI = (UIElement)(Enum.GetValues(typeof(UIElement)).Length - 1);
 
-                for (int i = 0; i < upgradesToShow.Length; i++)
-                {
-                    PrintUpgrade(i);
-                }
+                PrintAllUpgrades();
             }
             else if (key == ConsoleKey.D)
             {
                 selectedUI += 1;
                 if (selectedUI > (UIElement)(Enum.GetValues(typeof(UIElement)).Length - 1)) selectedUI = 0;
 
-                for (int i = 0; i < upgradesToShow.Length; i++)
-                {
-                    PrintUpgrade(i);
-                }
+                PrintAllUpgrades();
             }
             else if (key == ConsoleKey.W)
             {
-                if (selectedUI == UIElement.Upgrades)
+                if (selectedUI == UIElement.Upgrades && upgradesToShow.Length > 1)
                 {
                     selectedUpgradeIndex--;
-
                     if(selectedUpgradeIndex == -1)
                     {
                         selectedUpgradeIndex = 0;
@@ -117,18 +149,14 @@ namespace OOAGame
                         }
                     }
 
-                    for(int i = 0; i < upgradesToShow.Length; i++)
-                    {
-                        PrintUpgrade(i);
-                    }
+                    PrintAllUpgrades();
                 }
             }
             else if (key == ConsoleKey.S)
             {
-                if (selectedUI == UIElement.Upgrades)
+                if (selectedUI == UIElement.Upgrades && upgradesToShow.Length > 1)
                 {
                     selectedUpgradeIndex++;
-
                     if(selectedUpgradeIndex == upgradesToShow.Length)
                     {
                         selectedUpgradeIndex = upgradesToShow.Length - 1;
@@ -144,13 +172,25 @@ namespace OOAGame
                             }
                         }
                     }
-                    
 
-                    for (int i = 0; i < upgradesToShow.Length; i++)
-                    {
-                        PrintUpgrade(i);
-                    }
+                    PrintAllUpgrades();
                 }
+            }
+        }
+
+        private static void PrintAllUpgrades()
+        {
+            int totalHeight = 1;
+            for (int i = 0; i < upgradesToShow.Length; i++)
+            {
+                PrintUpgrade(i);
+                totalHeight += upgradesToShow[i].BoxHeight;
+            }
+
+            for(int i = totalHeight; i < Console.WindowHeight; i++)
+            {
+                Console.SetCursorPosition(Console.WindowWidth - UPGRADE_BOX_WIDTH, i);
+                Console.Write(new string(' ', UPGRADE_BOX_WIDTH));
             }
         }
 
@@ -199,7 +239,6 @@ namespace OOAGame
                 }
             }
 
-            
             upgradesToShow = newUpgrades.ToArray();
         }
 
@@ -227,12 +266,12 @@ namespace OOAGame
             Console.Write(beansCounter + new string(' ', UPGRADE_BOX_WIDTH - beansCounter.Length - 1));
         }
 
-        public static void PrintBeanstalk(int index)
+        public static void PrintBeanstalk()
         {
             PrintBorder((0, 0, BEANSTALK_BOX_WIDTH, Console.WindowHeight), selectedUI == UIElement.Beanstalk, false);
 
             List<string> art = new();
-            using (StreamReader sr = new StreamReader($"Art\\Art{index}.txt"))
+            using (StreamReader sr = new StreamReader($"Art\\Art{currentBeanstalkSprite}.txt"))
             {
                 string? line;
                 // Read lines from the file until the end of the file is reached.

@@ -28,16 +28,10 @@ namespace OOAGame
                     Beanstalk.NextFrame();
                 }
 
-                GraphicsManager.PrintBeanstalk(0);
                 GraphicsManager.PrintStatCounters();
-                /*GraphicsManager.PrintAllUI();
-                Console.SetCursorPosition(0, 3);
-                for(int i = 0; i < UpgradeManager.upgrades.Length; i++)
-                {
-                    Upgrade upgrade = UpgradeManager.upgrades[i];
-                    Console.WriteLine($"{upgrade.name}: {(int)upgrade.Cost}\n {upgrade.description}");
-                }
-                GraphicsManager.PrintBeanstalk();*/
+                GraphicsManager.PrintBeanstalk();
+
+                Thread.Sleep(10); // Added small delay between loops to reduce strain on the CPU.
             }
         }
     }
