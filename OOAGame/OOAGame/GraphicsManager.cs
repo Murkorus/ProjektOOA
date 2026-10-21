@@ -12,9 +12,17 @@ namespace OOAGame
             Upgrades
         }
         public const int UPGRADE_BOX_WIDTH = 40;
-        public const int BEANSTALK_BOX_WIDTH = 80;
+        public const int BEANSTALK_BOX_WIDTH = 80; // Beanstalk ascii art must at most be this width minus 2 to account for the box border. So if width is 80, ascii art can at most have 78 characters per line.
         public static Upgrade[] upgradesToShow;
         public static int selectedUpgradeIndex = 0;
+        private static int SelectedUpgradeID
+        {
+            get => field = upgradesToShow[selectedUpgradeIndex].id;
+        }
+        private static Upgrade SelectedUpgrade
+        {
+            get => UpgradeManager.upgrades[SelectedUpgradeID];
+        }
         public static UIElement selectedUI = 0;
         private static ConsoleColor selectedColor = ConsoleColor.White;
         private static ConsoleColor unselectedColor = ConsoleColor.DarkGreen;
@@ -28,18 +36,43 @@ namespace OOAGame
             }
         }
 
+        /// <summary>
+        /// Takes input in the form of a pressed ConsoleKey, and then decides what functions to execute based on that input.
+        /// </summary>
+        /// <param name="key">The key that was pressed.</param>
         public static void ExecuteInput(ConsoleKey key)
         {
             if (key == ConsoleKey.Spacebar)
             {
                 if (selectedUI == UIElement.Beanstalk)
                 {
+                    // If the player currently has the beanstalk viewport selected, and they press space, execute a click.
                     Beanstalk.Click();
                 }
                 else if (selectedUI == UIElement.Upgrades)
                 {
-                    UpgradeManager.BuyUpgrade(upgradesToShow[selectedUpgradeIndex].id);
-                    PrintUpgrade(selectedUpgradeIndex);
+                    // If the player currently has an upgrade selected, and they press space, buy that upgrade and update its visuals.
+                    UpgradeManager.BuyUpgrade(SelectedUpgradeID);
+
+                    if (SelectedUpgrade.currentCount >= SelectedUpgrade.maxCount)
+                    {
+                        UpgradeManager.upgrades[SelectedUpgradeID].isVisible = false;
+                        if (SelectedUpgradeID > 0)
+                        {
+                            for (int i = SelectedUpgradeID - 1; i >= 0; i--)
+                            {
+                                if (UpgradeManager.upgrades[i].isVisible)
+                                {
+                                    UpdateShownUpgrades(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    for (int i = 0; i < upgradesToShow.Length; i++)
+                    {
+                        PrintUpgrade(i);
+                    }
                 }
             }
             else if (key == ConsoleKey.A)
@@ -71,9 +104,9 @@ namespace OOAGame
                     if(selectedUpgradeIndex == -1)
                     {
                         selectedUpgradeIndex = 0;
-                        if (upgradesToShow[selectedUpgradeIndex].id > 0)
+                        if (SelectedUpgradeID > 0)
                         {
-                            for (int i = upgradesToShow[selectedUpgradeIndex].id - 1; i >= 0; i--)
+                            for (int i = SelectedUpgradeID - 1; i >= 0; i--)
                             {
                                 if (UpgradeManager.upgrades[i].isVisible)
                                 {
@@ -99,9 +132,9 @@ namespace OOAGame
                     if(selectedUpgradeIndex == upgradesToShow.Length)
                     {
                         selectedUpgradeIndex = upgradesToShow.Length - 1;
-                        if (upgradesToShow[selectedUpgradeIndex].id < UpgradeManager.upgrades.Length - 1)
+                        if (SelectedUpgradeID < UpgradeManager.upgrades.Length - 1)
                         {
-                            for (int i = upgradesToShow[selectedUpgradeIndex].id + 1; i < UpgradeManager.upgrades.Length; i++)
+                            for (int i = SelectedUpgradeID + 1; i < UpgradeManager.upgrades.Length; i++)
                             {
                                 if (UpgradeManager.upgrades[i].isVisible)
                                 {
@@ -172,12 +205,25 @@ namespace OOAGame
 
         public static void PrintStatCounters()
         {
+            // I want to display the height counter at the top of the middle of the beanstalk viewbox.
+            // To display it in the middle, I need to know how long the string to display is, so I can measure the halfway-point along the string.
+            // So I start by setting up the full string to be displayed.
             string heightCounter = ((int)Beanstalk.height).ToString() + " cm";
+            // Since I know the beanstalk viewport box will be on the left side of the screen, I can simply take half the width of that box as the middle point.
+            // Then I need the string start point to be half of the string's length further to the left, so that the middle of the string will line up with the middle of the box.
+            // The y position of the cursor is 1 to account for the box border of the beanstalk viewbox.
             Console.SetCursorPosition(BEANSTALK_BOX_WIDTH / 2 - heightCounter.Length / 2, 1);
             Console.Write(heightCounter);
 
-            Console.SetCursorPosition(Console.WindowWidth - UPGRADE_BOX_WIDTH + 1, 0);
+            // I want to display the beans counter over the upgrades section. Right now, I'm working on the principle that the beanstalk window and upgrade windows are sitting right next to each other.
+            // So I could in theory just place the beans counter next to the beanstalk window and get the same effect.
+            // However if I one day change this positional relationship, the beanstalk counter will then be displayed in the wrong place.
+            // Therefore I need to use the upgrade box dimensions as a reference point rather than the beanstalk box.
+            Console.SetCursorPosition(Console.WindowWidth - UPGRADE_BOX_WIDTH, 0);
+            // Simlarly to the height counter, I start by creating the full string to be displayed.
             string beansCounter = "Beans: $" + (int)Beanstalk.beans + " +" + (int)Beanstalk.GetAverageBeansPerSecond() + "/s";
+            // I am appending a bunch of spaces at the end of the beans counter such that when the player purchases an upgrade and the number of beans is reduced, there are no lingering artifacts.
+            // The spaces are there to erase previously written bean counter text by writing on top of it. It creates spaces out to the last point along the upgrade box width.
             Console.Write(beansCounter + new string(' ', UPGRADE_BOX_WIDTH - beansCounter.Length - 1));
         }
 
@@ -192,6 +238,7 @@ namespace OOAGame
                 // Read lines from the file until the end of the file is reached.
                 while ((line = sr.ReadLine()) != null)
                 {
+                    if(line.Length > BEANSTALK_BOX_WIDTH - 2) line = line.Substring(0, BEANSTALK_BOX_WIDTH - 2);
                     art.Add(line);
                 }
             }
