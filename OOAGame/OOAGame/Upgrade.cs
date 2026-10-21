@@ -34,17 +34,6 @@ namespace OOAGame
 
         }
 
-        /// <summary>
-        /// Applies the upgrade parameters by adding the upgrade values to the beanstalk class values.
-        /// </summary>
-        public void Apply()
-        {
-            Beanstalk.heightPerSecond += heightPerSecond;
-            Beanstalk.heightPerClick += heightPerClick;
-            Beanstalk.beansPerSecond += beansPerSecond;
-            Beanstalk.beansPerSecondPerHeight += beansPerSecondPerHeight;
-        }
-
         /*
         /// <summary>
         /// Compares the name of two Upgrades to check if they are equal, since all other variables do not matter.

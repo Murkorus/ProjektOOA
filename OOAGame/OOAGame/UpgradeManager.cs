@@ -12,7 +12,7 @@ namespace OOAGame
         {
             new(){id = 0, name = "Sprinkler", description = "+1 height per second", baseCost = 10, heightPerSecond = 1, maxCount = 1},
             new(){id = 1, name = "Gardener", description = "+0.01 beans per second per height", baseCost = 30, maxCount = 3, beansPerSecondPerHeight = 0.01f},
-            new(){id = 2, name = "Fertilizer", description = "+20% chance to double amount of beans gained whenever you gain beans", baseCost = 200, maxCount = 1},
+            new(){id = 2, name = "Fertilizer", description = "+20% chance to double amount of beans gained whenever you gain beans", baseCost = 200, maxCount = 5},
             new(){id = 3, name = "A", description = "AAAAA", baseCost = 20, maxCount = 1},
             new(){id = 4, name = "B", description = "BBBBB", baseCost = 20, maxCount = 1},
             new(){id = 5, name = "C", description = "CCCC", baseCost = 20, maxCount = 1},
@@ -24,6 +24,16 @@ namespace OOAGame
         public static Upgrade[] GetVisibleUpgrades()
         {
             return upgrades.Where(x => x.isVisible).ToArray();
+        }
+
+        public static bool HasBought(int index)
+        {
+            return GetUpgradeCount(index) > 0;
+        }
+
+        public static bool HasBought(string name)
+        {
+            return GetUpgradeCount(name) > 0;
         }
 
         public static int GetUpgradeCount(int index)
@@ -47,10 +57,8 @@ namespace OOAGame
             if (upgrade.currentCount >= upgrade.maxCount) return; // If the player has already bought the max amount they can
             if (Beanstalk.beans < upgrade.Cost) return; // If the player doesn't have enough money
 
-            Beanstalk.beans -= upgrade.Cost;
-
             upgrades[index].currentCount++;
-            upgrade.Apply();
+            Beanstalk.ApplyUpgrade(upgrade);
         }
     }
 }
