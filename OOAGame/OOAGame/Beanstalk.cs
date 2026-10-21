@@ -93,10 +93,12 @@ namespace OOAGame
         {
             beans -= upgrade.Cost;
 
-            heightPerSecond += heightPerSecond;
-            heightPerClick += heightPerClick;
-            beansPerSecond += beansPerSecond;
-            beansPerSecondPerHeight += beansPerSecondPerHeight;
+            heightPerSecond += upgrade.heightPerSecond;
+            heightPerClick += upgrade.heightPerClick;
+            beansPerSecond += upgrade.beansPerSecond;
+            beansPerSecondPerHeight += upgrade.beansPerSecondPerHeight;
+
+            upgrade.currentCount++;
         }
 
         /// <summary>
