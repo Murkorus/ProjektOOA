@@ -1,0 +1,14 @@
+@startuml
+'skinparam classAttributeIconSize 0
+
+class Program
+Program : - {static} frameTime : float
+Program : - {static} long lastCheckedTime
+Program : - {static void Main(string[] args)
+
+class Beanstalk
+Beanstalk : - {static} float height <<get>> <<private set>>
+Beanstalk : + {static} float getHeight
+Beanstalk : - {static} float beans
+Beanstalk : + {static} float getBeans
+@enduml

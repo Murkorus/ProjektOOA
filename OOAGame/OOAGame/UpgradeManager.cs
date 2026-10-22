@@ -49,7 +49,7 @@ namespace OOAGame
         /// <returns>The number of times the Upgrade at the given index has been bought.</returns>
         public static int GetUpgradeCount(int index)
         {
-            return upgrades[index].currentCount;
+            return upgrades[index].CurrentCount;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace OOAGame
         /// <returns>The number of times the Upgrade with the given name has been bought.</returns>
         public static int GetUpgradeCount(string name)
         {
-            return upgrades.Where(x => x.name == name).First().currentCount;
+            return upgrades.Where(x => x.name == name).First().CurrentCount;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace OOAGame
         /// <param name="index">The index of the Upgrade in <see cref="upgrades"/>.</param>
         public static void BuyUpgrade(int index)
         {
-            if (upgrades[index].currentCount >= upgrades[index].maxCount) return; // If the player has already bought the max amount they can
+            if (upgrades[index].CurrentCount >= upgrades[index].maxCount) return; // If the player has already bought the max amount they can
             if (Beanstalk.beans < upgrades[index].Cost) return; // If the player doesn't have enough money
 
             Beanstalk.ApplyUpgrade(upgrades[index]);

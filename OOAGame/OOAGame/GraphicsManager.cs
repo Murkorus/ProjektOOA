@@ -68,7 +68,7 @@ namespace OOAGame
                     UpgradeManager.BuyUpgrade(SelectedUpgradeID);
 
                     // If the upgrade has been bought the max number of times, hide it from the list.
-                    if (SelectedUpgrade.currentCount >= SelectedUpgrade.maxCount)
+                    if (SelectedUpgrade.CurrentCount >= SelectedUpgrade.maxCount)
                     {
                         // Firstly I want to check if this is the last visible upgrade left.
                         // If it is, then there will be no upgrades left to print after this one is gone, so just remove it from the list and move on.
@@ -339,7 +339,7 @@ namespace OOAGame
             Console.SetCursorPosition(box.posX + 1, box.posY + 1);
             Console.Write(upgradesToShow[index].name);
             // Here I'm printing out the number of times this upgrade has been bought, as well as the maximum number of times it can be bought (if it's not unlimited).
-            Console.Write(" [" + upgradesToShow[index].currentCount + (upgradesToShow[index].maxCount == int.MaxValue ? "" : ("/" + upgradesToShow[index].maxCount)) + "]");
+            Console.Write(" [" + upgradesToShow[index].CurrentCount + (upgradesToShow[index].maxCount == int.MaxValue ? "" : ("/" + upgradesToShow[index].maxCount)) + "]");
 
             // Printing the cost of the upgrade. I am doing this one the same line as the name. This does have the downside of meaning that if the cost gets insanely high, it will eventually override the name, and potentially break out of the box to the left.
             // I could account for this by simply shortening the cost to E+ some number if it becomes a problem.

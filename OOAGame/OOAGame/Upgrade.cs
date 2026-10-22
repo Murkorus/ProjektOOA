@@ -14,15 +14,19 @@ namespace OOAGame
         required public string description { get; init; } = "Default";
         required public float baseCost { get; init; } = 10;
         public int maxCount { get; init; } = int.MaxValue;
-        public int currentCount
+        private int currentCount = 0;
+        public int CurrentCount
         {
-            get;
+            get
+            {
+                return currentCount;
+            }
             set
             {
-                if(value < 0) throw new ArgumentOutOfRangeException("value");
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
                 currentCount = value;
             }
-        } = 0;
+        }
         public float beansPerSecond { get; init; } = 0;
         public float heightPerSecond { get; init; } = 0;
         public float heightPerClick { get; init; } = 0;

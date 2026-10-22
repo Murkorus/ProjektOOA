@@ -98,7 +98,7 @@ namespace OOAGame
             beansPerSecond += upgrade.beansPerSecond;
             beansPerSecondPerHeight += upgrade.beansPerSecondPerHeight;
 
-            upgrade.currentCount++;
+            upgrade.CurrentCount++;
         }
 
         /// <summary>
