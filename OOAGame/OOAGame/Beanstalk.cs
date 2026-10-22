@@ -7,7 +7,7 @@ namespace OOAGame
     public static class Beanstalk
     {
         // The height at which the final frame will be displayed.
-        public static float maxSpriteHeight = 1000;
+        public static float maxSpriteHeight = 10000;
         
         // Stats that need to publicly readable
         public static float height { get; private set; } = 0;
