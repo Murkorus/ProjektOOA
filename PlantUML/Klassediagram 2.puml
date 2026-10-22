@@ -2,8 +2,8 @@
 'skinparam classAttributeIconSize 0
 
 class Program
-Program --> Beanstalk : NextFrame()
-Program --> GraphicsManager
+Program ..> Beanstalk : NextFrame()
+Program ..> GraphicsManager
 Program : - {static} frameTime: float
 Program : - {static} lastCheckedTime: long
 Program : - {static} Main(string[] args): void
@@ -12,8 +12,6 @@ class Beanstalk
 Beanstalk : + {static} Height: float {readonly}
 Beanstalk : + {static} Beans: float {readonly}
 
-Beanstalk : - {static} height: float
-Beanstalk : - {static} beans: float
 Beanstalk : - {static} beansPerSecondPerHeight: float
 Beanstalk : - {static} beansPerSecond: float
 Beanstalk : - {static} heightPerSecond: float
@@ -39,27 +37,18 @@ Upgrade : + BoxHeight: int
 Upgrade : + Id: int {readonly}
 Upgrade : + Name: string {readonly}
 Upgrade : + Description: string {readonly}
-Upgrade : + BaseCost: float {readonly}
+'Upgrade : + BaseCost: float {readonly}
 Upgrade : + MaxCount: int {readonly}
 Upgrade : + BeansPerSecond: float {readonly}
 Upgrade : + HeightPerSecond: float {readonly}
 Upgrade : + HeightPerClick: float {readonly}
 Upgrade : + BeansPerSecondPerHeight: float {readonly}
 
-Upgrade : - id: int
-Upgrade : - name: string
-Upgrade : - description: string
 Upgrade : - baseCost: float
-Upgrade : - maxCount: int
-Upgrade : - beansPerSecond: float
-Upgrade : - heightPerSecond: float
-Upgrade : - heightPerClick: float
-Upgrade : - beansPerSecondPerHeight: float
 
 class UpgradeManager
 UpgradeManager "1" *-- "0..*" Upgrade : contains
-UpgradeManager --> Beanstalk
-UpgradeManager : - {static} upgrades: Upgrade[]
+UpgradeManager ..> Beanstalk
 UpgradeManager : + {static} Upgrades: Upgrade[]
 UpgradeManager : + {static} VisibleUpgrades: Upgrade[]
 
@@ -68,9 +57,9 @@ UpgradeManager : + {static} GetUpgradeCount(): int
 UpgradeManager : + {static} BuyUpgrade(): void
 
 class GraphicsManager
-GraphicsManager --> UpgradeManager
+GraphicsManager ..> UpgradeManager
 GraphicsManager --> UIElement
-GraphicsManager --> Beanstalk
+GraphicsManager ..> Beanstalk
 GraphicsManager : - {static} selectedUI: UIElement
 GraphicsManager : - {static} upgradesToShow: Upgrade[]
 GraphicsManager : - {static} selectedUpgradeIndex: int
