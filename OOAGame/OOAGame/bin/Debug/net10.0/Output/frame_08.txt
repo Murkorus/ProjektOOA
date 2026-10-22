@@ -12,17 +12,17 @@
                                                                               
                                                                               
                                                                               
-                                        o                                     
-                                        o                                     
-                                    ooooo                                     
-                                   ooo ooo                                    
-                                    o  ooo                                    
-                                       oo                                     
-                                     oooo                                     
-                                    oo oo                                     
-                                       oo                                     
-                                       oooo                                   
-                                     ooooooo                                  
-                                    ooooo  o                                  
-                                    o  oo                                     
-                                       ooo                                    
+                                        ▒                                     
+                                        ▒                                     
+                                    ▒▒▒▒▒                                     
+                                   ▒▒▒ ▒▒▒                                    
+                                    ▒  ▒▒▒                                    
+                                       ▒▒                                     
+                                     ▒▒▒▒                                     
+                                    ▒▒ ▒▒                                     
+                                       ▒▒                                     
+                                       ▒▒▒▒                                   
+                                     ▒▒▒▒▒▒▒                                  
+                                    ▒▒▒▒▒  ▒                                  
+                                    ▒  ▒▒                                     
+                                       ▒▒▒                                    
