@@ -20,6 +20,10 @@ namespace OOAGame
                 if (Console.KeyAvailable)
                 {
                     GraphicsManager.ExecuteInput(Console.ReadKey(true).Key);
+                    while (Console.KeyAvailable) // Flushes excess input from receiving input faster than application can process it (reduces lag)
+                    {
+                        Console.ReadKey(true);
+                    }
                 }
 
                 if(Stopwatch.GetElapsedTime(lastCheckedTime).TotalSeconds >= frameTime) // Run this code if it's been at least frameTime number of seconds since it was last executed

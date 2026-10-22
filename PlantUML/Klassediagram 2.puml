@@ -17,4 +17,67 @@ Beanstalk : - {static} beansPerSecond: float
 Beanstalk : - {static} heightPerSecond: float
 Beanstalk : - {static} heightPerClick: float
 Beanstalk : - {static} beansPerClick: float
+
+Beanstalk : + {static} Click(): void
+Beanstalk : + {static} NextFrame(): void
+Beanstalk : + {static} ApplyUpgrade(): void
+Beanstalk : + {static} GetAverageBeansPerSecond(): float
+
+Beanstalk : - {static} AddBeans(): void
+Beanstalk : - {static} AddHeight(): void
+Beanstalk : - {static} AddHeightPerSecond(): void
+Beanstalk : - {static} AddBeansPerSecond(): void
+Beanstalk : - {static} AddOnClick(): void
+
+class Upgrade
+Upgrade : + currentCount: int
+Upgrade : + isVisible: bool
+Upgrade : + Cost: float
+Upgrade : + BoxHeight: int
+Upgrade : + Id: int {readonly}
+Upgrade : + Name: string {readonly}
+Upgrade : + Description: string {readonly}
+Upgrade : + BaseCost: float {readonly}
+Upgrade : + MaxCount: int {readonly}
+Upgrade : + BeansPerSecond: float {readonly}
+Upgrade : + HeightPerSecond: float {readonly}
+Upgrade : + HeightPerClick: float {readonly}
+Upgrade : + BeansPerSecondPerHeight: float {readonly}
+
+Upgrade : - id: int
+Upgrade : - name: string
+Upgrade : - description: string
+Upgrade : - baseCost: float
+Upgrade : - maxCount: int
+Upgrade : - beansPerSecond: float
+Upgrade : - heightPerSecond: float
+Upgrade : - heightPerClick: float
+Upgrade : - beansPerSecondPerHeight: float
+
+class UpgradeManager
+UpgradeManager : - {static} upgrades: Upgrade[]
+UpgradeManager : + {static} Upgrades: Upgrade[]
+UpgradeManager : + {static} VisibleUpgrades: Upgrade[]
+
+UpgradeManager : + {static} HasBought(): bool
+UpgradeManager : + {static} GetUpgradeCount(): int
+UpgradeManager : + {static} BuyUpgrade(): void
+
+class GraphicsManager
+GraphicsManager : - {static} selectedUI: UIElement
+GraphicsManager : - {static} upgradesToShow: Upgrade[]
+GraphicsManager : - {static} selectedUpgradeIndex: int
+
+GraphicsManager : + {static} Load(): void
+GraphicsManager : + {static} ExecuteInput(): void
+GraphicsManager : + {static} PrintStatCounters(): void
+GraphicsManager : + {static} PrintBeanstalk(): void
+GraphicsManager : - {static} PrintUpgrade(): void
+GraphicsManager : - {static} PrintAllUpgrades(): void
+GraphicsManager : - {static} UpdateShownUpgrades(): void
+
+enum UIElement{
+Beanstalk,
+Upgrades
+}
 @enduml
