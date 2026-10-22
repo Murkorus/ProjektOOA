@@ -2,6 +2,8 @@
 'skinparam classAttributeIconSize 0
 
 class Program
+Program --> Beanstalk : NextFrame()
+Program --> GraphicsManager
 Program : - {static} frameTime: float
 Program : - {static} lastCheckedTime: long
 Program : - {static} Main(string[] args): void
@@ -55,6 +57,8 @@ Upgrade : - heightPerClick: float
 Upgrade : - beansPerSecondPerHeight: float
 
 class UpgradeManager
+UpgradeManager "1" *-- "0..*" Upgrade : contains
+UpgradeManager --> Beanstalk
 UpgradeManager : - {static} upgrades: Upgrade[]
 UpgradeManager : + {static} Upgrades: Upgrade[]
 UpgradeManager : + {static} VisibleUpgrades: Upgrade[]
@@ -64,6 +68,9 @@ UpgradeManager : + {static} GetUpgradeCount(): int
 UpgradeManager : + {static} BuyUpgrade(): void
 
 class GraphicsManager
+GraphicsManager --> UpgradeManager
+GraphicsManager --> UIElement
+GraphicsManager --> Beanstalk
 GraphicsManager : - {static} selectedUI: UIElement
 GraphicsManager : - {static} upgradesToShow: Upgrade[]
 GraphicsManager : - {static} selectedUpgradeIndex: int
