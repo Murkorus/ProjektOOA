@@ -101,6 +101,17 @@ namespace OOAGame
             heightPerClick += upgrade.heightPerClick;
             beansPerSecond += upgrade.beansPerSecond;
             beansPerSecondPerHeight += upgrade.beansPerSecondPerHeight;
+            if (upgrade.id == 3) // "Sell Trimmings"
+            {
+                float minHeight = 100;
+                if (height <= minHeight){
+                    return;
+                }
+                float toRemove = height * 0.10f;
+                height -= toRemove;
+                float beansToAdd = toRemove * 2;
+                AddBeans(beansToAdd);
+            }
 
             upgrade.CurrentCount++;
         }

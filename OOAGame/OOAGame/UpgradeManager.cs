@@ -15,6 +15,7 @@ namespace OOAGame
             new(){id = 0, name = "Sprinkler", description = "+1 height per second", baseCost = 5, heightPerSecond = 1},
             new(){id = 1, name = "Gardener", description = "+0.01 beans per second per height", baseCost = 30, maxCount = 3, beansPerSecondPerHeight = 0.01f},
             new(){id = 2, name = "Fertilizer", description = "+20% chance to double amount of beans gained whenever you gain beans", baseCost = 200, maxCount = 5},
+            new(){id = 3, name = "Sell Trimmings", description = "-10% height, recieve 2x the amount in beans. Min of 100cm", baseCost = 0},
         };
 
         public static Upgrade[] Upgrades { get => upgrades; private set => upgrades = value; }
