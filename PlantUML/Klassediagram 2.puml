@@ -2,13 +2,19 @@
 'skinparam classAttributeIconSize 0
 
 class Program
-Program : - {static} frameTime : float
-Program : - {static} long lastCheckedTime
-Program : - {static void Main(string[] args)
+Program : - {static} frameTime: float
+Program : - {static} lastCheckedTime: long
+Program : - {static} Main(string[] args): void
 
 class Beanstalk
-Beanstalk : - {static} float height <<get>> <<private set>>
-Beanstalk : + {static} float getHeight
-Beanstalk : - {static} float beans
-Beanstalk : + {static} float getBeans
+Beanstalk : + {static} Height: float {readonly}
+Beanstalk : + {static} Beans: float {readonly}
+
+Beanstalk : - {static} height: float
+Beanstalk : - {static} beans: float
+Beanstalk : - {static} beansPerSecondPerHeight: float
+Beanstalk : - {static} beansPerSecond: float
+Beanstalk : - {static} heightPerSecond: float
+Beanstalk : - {static} heightPerClick: float
+Beanstalk : - {static} beansPerClick: float
 @enduml

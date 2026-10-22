@@ -147,7 +147,7 @@ namespace OOAGame
 
                 PrintUpgrade(selectedUpgradeIndex);
             }
-            else if (key == ConsoleKey.W || key == ConsoleKey.RightArrow)
+            else if (key == ConsoleKey.W || key == ConsoleKey.UpArrow)
             {
                 // You can only go up when the Upgrades interface is selected.
                 if (selectedUI == UIElement.Upgrades && upgradesToShow.Length > 1)
@@ -173,7 +173,7 @@ namespace OOAGame
                     PrintAllUpgrades();
                 }
             }
-            else if (key == ConsoleKey.S)
+            else if (key == ConsoleKey.S || key == ConsoleKey.DownArrow)
             {
                 if (selectedUI == UIElement.Upgrades && upgradesToShow.Length > 1)
                 {
