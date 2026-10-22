@@ -6,6 +6,9 @@ namespace OOAGame
 {
     public static class Beanstalk
     {
+        // The height at which the final frame will be displayed.
+        public static float maxSpriteHeight = 1000;
+        
         // Stats that need to publicly readable
         public static float height { get; private set; } = 0;
         public static float beans { get; private set; } = 0;
@@ -39,6 +42,7 @@ namespace OOAGame
         private static void AddHeight(float heightToAdd)
         {
             height += heightToAdd;
+
         }
 
         /// <summary>

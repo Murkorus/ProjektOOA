@@ -290,9 +290,17 @@ namespace OOAGame
         public static void PrintBeanstalk()
         {
             PrintBorder((0, 0, BEANSTALK_BOX_WIDTH, Console.WindowHeight), selectedUI == UIElement.Beanstalk, false);
+            float height = Beanstalk.height;
+            float lastSprite = Beanstalk.maxSpriteHeight;
+            int frames = 23;
+
+            float progress = height / lastSprite;
+            int frameNumber = (int)(progress * frames);
+            frameNumber = Math.Clamp(frameNumber, 0, frames - 1);
+            currentBeanstalkSprite = frameNumber;
 
             List<string> art = new();
-            using (StreamReader sr = new StreamReader($"Art\\Art{currentBeanstalkSprite}.txt"))
+            using (StreamReader sr = new StreamReader($"BeanFrames\\frame_{currentBeanstalkSprite}.txt"))
             {
                 string? line;
                 // Read lines from the file until the end of the file is reached.
@@ -306,7 +314,9 @@ namespace OOAGame
             for (int i = 0; i < art.Count; i++)
             {
                 Console.SetCursorPosition(1, 1 + i);
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write(art[i]);
+                Console.ResetColor();
             }
         }
 

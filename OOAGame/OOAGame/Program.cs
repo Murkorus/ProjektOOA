@@ -28,8 +28,8 @@ namespace OOAGame
                     Beanstalk.NextFrame();
                 }
 
-                GraphicsManager.PrintStatCounters();
                 GraphicsManager.PrintBeanstalk();
+                GraphicsManager.PrintStatCounters();
 
                 Thread.Sleep(10); // Added small delay between loops to reduce strain on the CPU.
             }
