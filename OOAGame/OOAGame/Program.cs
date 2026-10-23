@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace OOAGame
 {
@@ -9,12 +10,14 @@ namespace OOAGame
 
         static void Main(string[] args)
         {
+            // Setting up everything
             Console.CursorVisible = false;
-            Console.SetWindowSize(120, 30);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) Console.SetWindowSize(120, 30);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             lastCheckedTime = Stopwatch.GetTimestamp();
             GraphicsManager.Load();
+
             while (true)
             {
                 if (Console.KeyAvailable)
@@ -35,7 +38,7 @@ namespace OOAGame
                 GraphicsManager.PrintBeanstalk();
                 GraphicsManager.PrintStatCounters();
 
-                Thread.Sleep(10); // Added small delay between loops to reduce strain on the CPU.
+                Thread.Sleep(25); // Added small delay between loops to reduce strain on the CPU.
             }
         }
     }

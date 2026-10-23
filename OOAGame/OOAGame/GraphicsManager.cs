@@ -19,7 +19,7 @@ namespace OOAGame
         public const int UPGRADE_BOX_WIDTH = 40;
         public const int BEANSTALK_BOX_WIDTH = 80; // Beanstalk ascii art must at most be this width minus 2 to account for the box border. So if width is 80, ascii art can at most have 78 characters per line.
         
-        private static Upgrade[] upgradesToShow;
+        private static Upgrade[] upgradesToShow = [];
         private static int selectedUpgradeIndex = 0;
 
         /// <summary>
@@ -156,23 +156,28 @@ namespace OOAGame
                     selectedUpgradeIndex--;
                     if(selectedUpgradeIndex == -1)
                     {
+                        // Clamps the selector value
                         selectedUpgradeIndex = 0;
-                        if (SelectedUpgradeID > 0)
+
+                        // This happens when the player has selected the top-most displayed Upgrade, and then tried to move up again.
+                        // In that case, the list of displayed Upgrades should move upwards by 1 index.
+                        // If there are no more upgrades above the currently selected one (i.e. if the selected index is the upgrade with id 0), the for-loop will just not run, since we can't go up.
+                        for (int i = SelectedUpgradeID - 1; i >= 0; i--)
                         {
-                            for (int i = SelectedUpgradeID - 1; i >= 0; i--)
+                            if (UpgradeManager.Upgrades[i].isVisible)
                             {
-                                if (UpgradeManager.Upgrades[i].isVisible)
-                                {
-                                    UpdateShownUpgrades(i);
-                                    break;
-                                }
+                                UpdateShownUpgrades(i);
+                                break;
                             }
                         }
+                        
                     }
 
+                    // It's easier to just reprint all upgrades than try to update only the specific ones that need to be changed, especially since not all upgrade boxes are the same size.
                     PrintAllUpgrades();
                 }
             }
+            // Same as the above if-statement, just in reverse.
             else if (key == ConsoleKey.S || key == ConsoleKey.DownArrow)
             {
                 if (selectedUI == UIElement.Upgrades && upgradesToShow.Length > 1)
@@ -181,17 +186,16 @@ namespace OOAGame
                     if(selectedUpgradeIndex == upgradesToShow.Length)
                     {
                         selectedUpgradeIndex = upgradesToShow.Length - 1;
-                        if (SelectedUpgradeID < UpgradeManager.Upgrades.Length - 1)
+
+                        for (int i = SelectedUpgradeID + 1; i < UpgradeManager.Upgrades.Length; i++)
                         {
-                            for (int i = SelectedUpgradeID + 1; i < UpgradeManager.Upgrades.Length; i++)
+                            if (UpgradeManager.Upgrades[i].isVisible)
                             {
-                                if (UpgradeManager.Upgrades[i].isVisible)
-                                {
-                                    UpdateShownUpgrades(i, true);
-                                    break;
-                                }
+                                UpdateShownUpgrades(i, true);
+                                break;
                             }
                         }
+                        
                     }
 
                     PrintAllUpgrades();
@@ -199,8 +203,12 @@ namespace OOAGame
             }
         }
 
+        /// <summary>
+        /// Prints each upgrade in <see cref="upgradesToShow"/>, and then adds extra spaces to fill out the console at the bottom.
+        /// </summary>
         private static void PrintAllUpgrades()
         {
+            // Using the total height of all printed Upgrades to decide how much whitespace is left at the bottom.
             int totalHeight = 1;
             for (int i = 0; i < upgradesToShow.Length; i++)
             {
@@ -208,6 +216,7 @@ namespace OOAGame
                 totalHeight += upgradesToShow[i].BoxHeight;
             }
 
+            // Prints whitespace at the bottom of the list of Upgrades to erase potential leftover characters from previously displayed Upgrades.
             for(int i = totalHeight; i < Console.WindowHeight; i++)
             {
                 Console.SetCursorPosition(Console.WindowWidth - UPGRADE_BOX_WIDTH, i);
@@ -215,54 +224,67 @@ namespace OOAGame
             }
         }
 
+        /// <summary>
+        /// Updates <see cref="upgradesToShow"/> with new Upgrades by iterating over each Upgrade in <see cref="UpgradeManager.upgrades"/> that can be displayed, starting from the <paramref name="firstUpgradeIndex"/>, and ending when there is no more space left on the screen.
+        /// </summary>
+        /// <param name="firstUpgradeIndex">The index of the upgrade in <see cref="UpgradeManager.upgrades"/> to start the algorithm at. Also the <see cref="Upgrade.id"/> of the Upgrade.</param>
+        /// <param name="startFromBottom">Whether the algorithm should work in reverse, iterating backwards through <see cref="UpgradeManager.upgrades"/> instead.</param>
         private static void UpdateShownUpgrades(int firstUpgradeIndex, bool startFromBottom = false)
         {
             List<Upgrade> newUpgrades = new();
+            Upgrade[] visibleUpgrades = UpgradeManager.VisibleUpgrades;
+
+            // Maps the given upgrade id to an index in the visibleUpgrades array.
+            firstUpgradeIndex = visibleUpgrades.IndexOf(UpgradeManager.Upgrades[firstUpgradeIndex]);
+
+            // The total height counts the height of all chosen upgrades on the screen so far.
+            // It starts at 1 to account for the beans counter displayed on top of the upgrades section at y = 0.
             int totalHeight = 1;
+
             if (startFromBottom)
             {
                 for (int i = firstUpgradeIndex; i >= 0; i--)
                 {
-                    if (!UpgradeManager.Upgrades[i].isVisible)
-                    {
-                        continue;
-                    }
-
-                    if (totalHeight + UpgradeManager.Upgrades[i].BoxHeight > Console.WindowHeight)
+                    // If the Upgrade that would be added would make the list larger than the console size currently allows, then the list is filled and the algorithm should stop.
+                    if (totalHeight + visibleUpgrades[i].BoxHeight > Console.WindowHeight)
                     {
                         break;
                     }
                     else
                     {
-                        totalHeight += UpgradeManager.Upgrades[i].BoxHeight;
-                        newUpgrades.Insert(0, UpgradeManager.Upgrades[i]);
+                        totalHeight += visibleUpgrades[i].BoxHeight;
+
+                        // When iterating backwards, the id of the Upgrades go down as i goes up.
+                        // Since upgrades should be ordered by id, I need to account for this by inserting the new Upgrade at index 0 rather than appending it to the end of the list.
+                        newUpgrades.Insert(0, visibleUpgrades[i]);
                     }
                 }
             }
             else
             {
-                for (int i = firstUpgradeIndex; i < UpgradeManager.Upgrades.Length; i++)
+                for (int i = firstUpgradeIndex; i < visibleUpgrades.Length; i++)
                 {
-                    if (!UpgradeManager.Upgrades[i].isVisible)
-                    {
-                        continue;
-                    }
-
-                    if (totalHeight + UpgradeManager.Upgrades[i].BoxHeight > Console.WindowHeight)
+                    if (totalHeight + visibleUpgrades[i].BoxHeight > Console.WindowHeight)
                     {
                         break;
                     }
                     else
                     {
-                        totalHeight += UpgradeManager.Upgrades[i].BoxHeight;
-                        newUpgrades.Add(UpgradeManager.Upgrades[i]);
+                        totalHeight += visibleUpgrades[i].BoxHeight;
+                        newUpgrades.Add(visibleUpgrades[i]);
                     }
                 }
             }
 
             upgradesToShow = newUpgrades.ToArray();
+
+            // The new list of upgrades might be shorter than it was before, in which case, clamp the selector.
+            if (selectedUpgradeIndex > upgradesToShow.Length - 1) selectedUpgradeIndex = upgradesToShow.Length - 1;
         }
 
+        /// <summary>
+        /// Prints the <see cref="Beanstalk.height"/> and <see cref="Beanstalk.beans"/> to the console as processed UI elements.
+        /// </summary>
         public static void PrintStatCounters()
         {
             // I want to display the height counter at the top of the middle of the beanstalk viewbox.
@@ -287,6 +309,9 @@ namespace OOAGame
             Console.Write(beansCounter + new string(' ', UPGRADE_BOX_WIDTH - beansCounter.Length - 1));
         }
 
+        /// <summary>
+        /// Prints beanstalk ascii art in the console.
+        /// </summary>
         public static void PrintBeanstalk()
         {
             PrintBorder((0, 0, BEANSTALK_BOX_WIDTH, Console.WindowHeight), selectedUI == UIElement.Beanstalk, false);
@@ -311,13 +336,29 @@ namespace OOAGame
                 }
             }
 
+            // We don't want to override the height counter with the art, so cut out the part of the art where the height counter would be printed.
+            string heightCounter = ((int)Beanstalk.height).ToString() + " cm";
+            // This is the formula calculating where to start the height counter string.
+            int heightCounterStart = BEANSTALK_BOX_WIDTH / 2 - heightCounter.Length / 2;
+
+            Console.ForegroundColor = ConsoleColor.Green;
             for (int i = 0; i < art.Count; i++)
             {
                 Console.SetCursorPosition(1, 1 + i);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write(art[i]);
-                Console.ResetColor();
+                if (i == 0) // If the art line to be printed is the first one, we have to print the letters individually so we can skip the ones where the heightCounter would be printed.
+                {
+                    for (int j = 0; j < art[0].Length; j++)
+                    {
+                        if (Console.GetCursorPosition().Left >= heightCounterStart && Console.GetCursorPosition().Left <= heightCounterStart + heightCounter.Length) continue;
+                        Console.Write(art[i][j]);
+                    }
+                }
+                else
+                {
+                    Console.Write(art[i]);
+                }
             }
+            Console.ResetColor();
         }
 
         public static void PrintUpgrade(int index)
@@ -376,14 +417,28 @@ namespace OOAGame
             }
         }
 
+        /// <summary>
+        /// Prints a square ascii border with the specified size and specified origin point as the top left corner.
+        /// </summary>
+        /// <param name="borderColor">The color of the border.</param>
+        /// <param name="position">The position in console coordinates of the top left corner of the box.</param>
+        /// <param name="size">The size in console coordinates of the box.</param>
+        /// <param name="fillBackground">Whether the empty space inside the box should be filled with space (' ') characters or not.</param>
         public static void PrintBorder(ConsoleColor borderColor, (int x, int y) position, (int x, int y) size, bool fillBackground)
         {
+            // This method was borrowed from another project and slightly modified to suit our purposes here.
+
             Console.ForegroundColor = borderColor;
+            // Since the algorithm that prints the border starts at index 0, the box will become 1 bigger than the given size.
+            // This behaviour is unintuitive, so I correct the input here.
             size = (size.x - 1, size.y - 1);
+
+
             for (int y = 0; y <= size.y; y++)
             {
                 for (int x = 0; x <= size.x; x++)
                 {
+                    // The character to be printed is decided based on the current coordinates of the box the algorithm is checking as given by the size argument.
                     char character = ' ';
                     if (x == 0 && y == 0) character = '┌';
                     else if (x == size.x && y == 0) character = '┐';
@@ -392,6 +447,7 @@ namespace OOAGame
                     else if (y == 0 || y == size.y) character = '─';
                     else if (x == 0 || x == size.x) character = '│';
 
+                    // If no character other than space was chosen, that means the current position is not on the border of the box, and so should be skipped.
                     if (!fillBackground && character == ' ') continue;
 
                     Console.SetCursorPosition(position.x + x, position.y + y);
@@ -401,6 +457,12 @@ namespace OOAGame
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Prints a square ascii border with the specified size and specified origin point as the top left corner.
+        /// </summary>
+        /// <param name="box">The position in console coordinates of the top left corner of the box, followed by the size in console coordinates of the box.</param>
+        /// <param name="selected">Whether this box is selected by the player. Determines the color of the border. If false, <see cref="unselectedColor"/>, if true, <see cref="selectedColor"/>.</param>
+        /// <param name="fillBackground">Whether the empty space inside the box should be filled with space (' ') characters or not.</param>
         public static void PrintBorder((int posX, int posY, int sizeX, int sizeY) box, bool selected = false, bool fillBackground = true)
         {
             PrintBorder(selected ? selectedColor : unselectedColor, (box.posX, box.posY), (box.sizeX, box.sizeY), fillBackground);

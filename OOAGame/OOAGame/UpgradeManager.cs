@@ -12,11 +12,11 @@ namespace OOAGame
         // A comprehensive list of upgrades. All upgrades are defined here directly in the code. They cannot be added at runtime.
         private static Upgrade[] upgrades =
         {
-            new(){id = 0, name = "Sprinkler", description = "+1 height per second", baseCost = 5, heightPerSecond = 1},
+            new(){id = 0, name = "Sprinkler", description = "+1 height per second", baseCost = 5, heightPerSecond = 1, maxCount = 2},
             new(){id = 1, name = "Watering Can", description = "+1 height per click", baseCost = 15, heightPerClick = 1},
             new(){id = 2, name = "Gardener", description = "+0.01 beans per second per height", baseCost = 50, maxCount = 1, beansPerSecondPerHeight = 0.01f},
             new(){id = 3, name = "Fertilizer", description = "+20% chance to double amount of beans gained whenever you gain beans", baseCost = 250, maxCount = 1},
-            new(){id = 4, name = "Sell Trimmings", description = "-10% height, recieve 2x the amount in beans. Min of 100cm", baseCost = 0},
+            new(){id = 4, name = "Sell Trimmings", description = "+5% of height in beans, -10% height", baseCost = 5},
             new(){id = 5, name = "Irrigation", description = "+10 height per second", baseCost = 200, heightPerSecond = 10},
             new(){id = 6, name = "Garden Hose", description = "+10 height per click", baseCost = 500, heightPerClick = 10},
             new(){id = 7, name = "Gardener 2", description = "Gardener's brother, +0.01 beans per second per height", baseCost = 1000, maxCount = 1, beansPerSecondPerHeight = 0.01f},
